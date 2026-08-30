@@ -7,18 +7,31 @@ import {
   View,
   Pressable,
   FlatList,
+  TextInput,
 } from 'react-native';
 
 type MenuItem = {
   id: string;
   name: string;
+  description: string;
   course: string;
   price: string;
 };
 
 function App() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [showAddScreen, setShowAddScreen] = useState(false);
 
+  // Show Add Menu Item screen
+  if (showAddScreen) {
+    return (
+      <AddMenuItemScreen
+        onCancel={() => setShowAddScreen(false)}
+      />
+    );
+  }
+
+  // Home screen
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -62,14 +75,142 @@ function App() {
           />
         )}
 
-        {/* Add button */}
+        {/* Add Menu Item button */}
         <Pressable
           style={styles.addButton}
-          onPress={() => {
-            // We will add the form here in the next step.
-          }}>
+          onPress={() => setShowAddScreen(true)}>
           <Text style={styles.addButtonText}>+ Add Menu Item</Text>
         </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+/*
+ * Add Menu Item Screen
+ */
+function AddMenuItemScreen({
+  onCancel,
+}: {
+  onCancel: () => void;
+}) {
+  const [dishName, setDishName] = useState('');
+  const [description, setDescription] = useState('');
+  const [course, setCourse] = useState('Starter');
+  const [price, setPrice] = useState('');
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Add Menu Item</Text>
+        <Text style={styles.subtitle}>
+          Enter the details of the new dish
+        </Text>
+      </View>
+
+      {/* Form */}
+      <View style={styles.formContainer}>
+        {/* Dish Name */}
+        <Text style={styles.label}>Dish Name</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter dish name"
+          value={dishName}
+          onChangeText={setDishName}
+        />
+
+        {/* Description */}
+        <Text style={styles.label}>Description</Text>
+
+        <TextInput
+          style={[styles.input, styles.descriptionInput]}
+          placeholder="Enter dish description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+
+        {/* Course */}
+        <Text style={styles.label}>Course</Text>
+
+        <View style={styles.courseContainer}>
+          <Pressable
+            style={[
+              styles.courseOption,
+              course === 'Starter' && styles.selectedCourse,
+            ]}
+            onPress={() => setCourse('Starter')}>
+            <Text
+              style={[
+                styles.courseOptionText,
+                course === 'Starter' && styles.selectedCourseText,
+              ]}>
+              Starter
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.courseOption,
+              course === 'Main Course' && styles.selectedCourse,
+            ]}
+            onPress={() => setCourse('Main Course')}>
+            <Text
+              style={[
+                styles.courseOptionText,
+                course === 'Main Course' && styles.selectedCourseText,
+              ]}>
+              Main Course
+            </Text>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.courseOption,
+              course === 'Dessert' && styles.selectedCourse,
+            ]}
+            onPress={() => setCourse('Dessert')}>
+            <Text
+              style={[
+                styles.courseOptionText,
+                course === 'Dessert' && styles.selectedCourseText,
+              ]}>
+              Dessert
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* Price */}
+        <Text style={styles.label}>Price</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter price"
+          value={price}
+          onChangeText={setPrice}
+          keyboardType="numeric"
+        />
+
+        {/* Buttons */}
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={styles.cancelButton}
+            onPress={onCancel}>
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </Pressable>
+
+          <Pressable
+            style={styles.saveButton}
+            onPress={() => {
+              // Saving will be added in Step 3.
+            }}>
+            <Text style={styles.saveButtonText}>Save Menu Item</Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -178,6 +319,102 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: '700',
+  },
+
+  formContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
+
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 7,
+    marginTop: 12,
+  },
+
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D9D9D9',
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: '#222222',
+  },
+
+  descriptionInput: {
+    height: 90,
+    textAlignVertical: 'top',
+  },
+
+  courseContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+
+  courseOption: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D9D9D9',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+
+  selectedCourse: {
+    backgroundColor: '#2E7D32',
+    borderColor: '#2E7D32',
+  },
+
+  courseOptionText: {
+    fontSize: 13,
+    color: '#555555',
+  },
+
+  selectedCourseText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 28,
+  },
+
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D9D9D9',
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+
+  cancelButtonText: {
+    color: '#555555',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+
+  saveButton: {
+    flex: 1,
+    backgroundColor: '#2E7D32',
+    borderRadius: 8,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
     fontWeight: '700',
   },
 });
