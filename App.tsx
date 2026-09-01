@@ -4,10 +4,10 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  View,
-  Pressable,
-  FlatList,
   TextInput,
+  TouchableOpacity,
+  View,
+  FlatList,
 } from 'react-native';
 
 type MenuItem = {
@@ -19,199 +19,230 @@ type MenuItem = {
 };
 
 function App() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [showAddScreen, setShowAddScreen] = useState(false);
+  const [screen, setScreen] = useState('home');
 
-  // Show Add Menu Item screen
-  if (showAddScreen) {
-    return (
-      <AddMenuItemScreen
-        onCancel={() => setShowAddScreen(false)}
-      />
-    );
-  }
-
-  // Home screen
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Restaurant Menu Manager</Text>
-        <Text style={styles.subtitle}>
-          Manage your restaurant menu
-        </Text>
-      </View>
-
-      {/* Main content */}
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>
-          MENU ITEMS ({menuItems.length})
-        </Text>
-
-        {menuItems.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>No menu items yet</Text>
-
-            <Text style={styles.emptyText}>
-              Add your first menu item to get started.
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={menuItems}
-            keyExtractor={item => item.id}
-            renderItem={({item}) => (
-              <View style={styles.menuCard}>
-                <View>
-                  <Text style={styles.dishName}>{item.name}</Text>
-                  <Text style={styles.course}>{item.course}</Text>
-                </View>
-
-                <Text style={styles.price}>R{item.price}</Text>
-              </View>
-            )}
-          />
-        )}
-
-        {/* Add Menu Item button */}
-        <Pressable
-          style={styles.addButton}
-          onPress={() => setShowAddScreen(true)}>
-          <Text style={styles.addButtonText}>+ Add Menu Item</Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
-  );
-}
-
-/*
- * Add Menu Item Screen
- */
-function AddMenuItemScreen({
-  onCancel,
-}: {
-  onCancel: () => void;
-}) {
   const [dishName, setDishName] = useState('');
   const [description, setDescription] = useState('');
-  const [course, setCourse] = useState('Starter');
+  const [course, setCourse] = useState('');
   const [price, setPrice] = useState('');
+
+  const [error, setError] = useState('');
+
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const showHome = () => {
+    setScreen('home');
+    setError('');
+  };
+
+  const showAddMenu = () => {
+    setScreen('add');
+    setError('');
+    setSuccessMessage('');
+  };
+
+  const saveMenuItem = () => {
+    if (dishName.trim() === '') {
+      setError('Please enter a dish name.');
+      return;
+    }
+
+    if (description.trim() === '') {
+      setError('Please enter a description.');
+      return;
+    }
+
+    if (course.trim() === '') {
+      setError('Please select a course.');
+      return;
+    }
+
+    if (price.trim() === '' || isNaN(Number(price))) {
+      setError('Please enter a valid price.');
+      return;
+    }
+
+    const newMenuItem: MenuItem = {
+      id: Date.now().toString(),
+      name: dishName.trim(),
+      description: description.trim(),
+      course: course,
+      price: price.trim(),
+    };
+
+    setMenuItems(currentItems => [...currentItems, newMenuItem]);
+
+    setDishName('');
+    setDescription('');
+    setCourse('');
+    setPrice('');
+    setError('');
+
+    setSuccessMessage('Menu item saved successfully!');
+
+    setScreen('home');
+  };
+
+  const renderMenuItem = ({item}: {item: MenuItem}) => {
+    return (
+      <View style={styles.menuCard}>
+        <View style={styles.menuHeader}>
+          <Text style={styles.dishName}>{item.name}</Text>
+
+          <Text style={styles.price}>R{item.price}</Text>
+        </View>
+
+        <Text style={styles.course}>{item.course}</Text>
+
+        <Text style={styles.description}>{item.description}</Text>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Add Menu Item</Text>
-        <Text style={styles.subtitle}>
-          Enter the details of the new dish
-        </Text>
-      </View>
+      {screen === 'home' && (
+        <View style={styles.content}>
+          <Text style={styles.title}>Restaurant Menu Manager</Text>
 
-      {/* Form */}
-      <View style={styles.formContainer}>
-        {/* Dish Name */}
-        <Text style={styles.label}>Dish Name</Text>
+          <Text style={styles.subtitle}>
+            Manage your restaurant menu easily
+          </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter dish name"
-          value={dishName}
-          onChangeText={setDishName}
-        />
+          {successMessage !== '' && (
+            <View style={styles.successCard}>
+              <Text style={styles.successText}>{successMessage}</Text>
+            </View>
+          )}
 
-        {/* Description */}
-        <Text style={styles.label}>Description</Text>
+          {menuItems.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyTitle}>No menu items</Text>
 
-        <TextInput
-          style={[styles.input, styles.descriptionInput]}
-          placeholder="Enter dish description"
-          value={description}
-          onChangeText={setDescription}
-          multiline
-        />
+              <Text style={styles.emptyText}>
+                No menu items have been added yet.
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={menuItems}
+              keyExtractor={item => item.id}
+              renderItem={renderMenuItem}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
 
-        {/* Course */}
-        <Text style={styles.label}>Course</Text>
-
-        <View style={styles.courseContainer}>
-          <Pressable
-            style={[
-              styles.courseOption,
-              course === 'Starter' && styles.selectedCourse,
-            ]}
-            onPress={() => setCourse('Starter')}>
-            <Text
-              style={[
-                styles.courseOptionText,
-                course === 'Starter' && styles.selectedCourseText,
-              ]}>
-              Starter
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={[
-              styles.courseOption,
-              course === 'Main Course' && styles.selectedCourse,
-            ]}
-            onPress={() => setCourse('Main Course')}>
-            <Text
-              style={[
-                styles.courseOptionText,
-                course === 'Main Course' && styles.selectedCourseText,
-              ]}>
-              Main Course
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={[
-              styles.courseOption,
-              course === 'Dessert' && styles.selectedCourse,
-            ]}
-            onPress={() => setCourse('Dessert')}>
-            <Text
-              style={[
-                styles.courseOptionText,
-                course === 'Dessert' && styles.selectedCourseText,
-              ]}>
-              Dessert
-            </Text>
-          </Pressable>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={showAddMenu}>
+            <Text style={styles.buttonText}>Add Menu Item</Text>
+          </TouchableOpacity>
         </View>
+      )}
 
-        {/* Price */}
-        <Text style={styles.label}>Price</Text>
+      {screen === 'add' && (
+        <View style={styles.content}>
+          <Text style={styles.title}>Add Menu Item</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter price"
-          value={price}
-          onChangeText={setPrice}
-          keyboardType="numeric"
-        />
+          <Text style={styles.label}>Dish Name</Text>
 
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          <Pressable
+          <TextInput
+            style={styles.input}
+            placeholder="Enter dish name"
+            value={dishName}
+            onChangeText={setDishName}
+          />
+
+          <Text style={styles.label}>Description</Text>
+
+          <TextInput
+            style={[styles.input, styles.descriptionInput]}
+            placeholder="Enter dish description"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+          />
+
+          <Text style={styles.label}>Course</Text>
+
+          <View style={styles.courseContainer}>
+            <TouchableOpacity
+              style={[
+                styles.courseButton,
+                course === 'Starter' && styles.selectedCourse,
+              ]}
+              onPress={() => setCourse('Starter')}>
+              <Text
+                style={[
+                  styles.courseText,
+                  course === 'Starter' && styles.selectedCourseText,
+                ]}>
+                Starter
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.courseButton,
+                course === 'Main Course' && styles.selectedCourse,
+              ]}
+              onPress={() => setCourse('Main Course')}>
+              <Text
+                style={[
+                  styles.courseText,
+                  course === 'Main Course' && styles.selectedCourseText,
+                ]}>
+                Main Course
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.courseButton,
+                course === 'Dessert' && styles.selectedCourse,
+              ]}
+              onPress={() => setCourse('Dessert')}>
+              <Text
+                style={[
+                  styles.courseText,
+                  course === 'Dessert' && styles.selectedCourseText,
+                ]}>
+                Dessert
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>Price</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Enter price"
+            keyboardType="numeric"
+            value={price}
+            onChangeText={setPrice}
+          />
+
+          {error !== '' && (
+            <Text style={styles.errorText}>{error}</Text>
+          )}
+
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={saveMenuItem}>
+            <Text style={styles.buttonText}>Save Menu Item</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.cancelButton}
-            onPress={onCancel}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.saveButton}
-            onPress={() => {
-              // Saving will be added in Step 3.
-            }}>
-            <Text style={styles.saveButtonText}>Save Menu Item</Text>
-          </Pressable>
+            onPress={showHome}>
+            <Text style={styles.cancelText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -222,46 +253,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F7F7',
   },
 
-  header: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
+  content: {
+    flex: 1,
+    padding: 24,
   },
 
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
     color: '#222222',
+    marginBottom: 8,
   },
 
   subtitle: {
-    marginTop: 6,
-    fontSize: 14,
-    color: '#777777',
+    fontSize: 15,
+    color: '#666666',
+    marginBottom: 20,
   },
 
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 20,
-  },
-
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#555555',
-    marginBottom: 14,
-  },
-
-  emptyContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 30,
+  emptyCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    borderRadius: 12,
+    marginBottom: 25,
   },
 
   emptyTitle: {
@@ -274,77 +288,76 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 15,
     color: '#777777',
-    textAlign: 'center',
+  },
+
+  successCard: {
+    backgroundColor: '#E8F5E9',
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+
+  successText: {
+    color: '#2E7D32',
+    fontSize: 14,
+    fontWeight: '600',
   },
 
   menuCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 16,
+    padding: 18,
+    borderRadius: 12,
     marginBottom: 12,
+  },
+
+  menuHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E5E5E5',
   },
 
   dishName: {
-    fontSize: 17,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#222222',
-  },
-
-  course: {
-    marginTop: 5,
-    fontSize: 14,
-    color: '#777777',
+    flex: 1,
   },
 
   price: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: '#333333',
   },
 
-  addButton: {
-    backgroundColor: '#2E7D32',
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12,
+  course: {
+    fontSize: 13,
+    color: '#666666',
+    marginTop: 5,
+    marginBottom: 8,
   },
 
-  addButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-
-  formContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
+  description: {
+    fontSize: 14,
+    color: '#555555',
+    lineHeight: 20,
   },
 
   label: {
     fontSize: 15,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 7,
-    marginTop: 12,
+    marginBottom: 8,
+    marginTop: 14,
   },
 
   input: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D9D9D9',
+    borderColor: '#DDDDDD',
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#222222',
   },
 
   descriptionInput: {
@@ -354,16 +367,17 @@ const styles = StyleSheet.create({
 
   courseContainer: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
   },
 
-  courseOption: {
+  courseButton: {
     flex: 1,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D9D9D9',
+    borderColor: '#DDDDDD',
     borderRadius: 8,
     paddingVertical: 12,
+    marginRight: 6,
     alignItems: 'center',
   },
 
@@ -372,9 +386,9 @@ const styles = StyleSheet.create({
     borderColor: '#2E7D32',
   },
 
-  courseOptionText: {
+  courseText: {
     fontSize: 13,
-    color: '#555555',
+    color: '#333333',
   },
 
   selectedCourseText: {
@@ -382,40 +396,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  buttonContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 28,
-  },
-
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#D9D9D9',
+  primaryButton: {
+    backgroundColor: '#2E7D32',
+    paddingVertical: 15,
     borderRadius: 8,
-    paddingVertical: 14,
     alignItems: 'center',
+    marginTop: 20,
   },
 
-  cancelButtonText: {
-    color: '#555555',
-    fontSize: 15,
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
   },
 
-  saveButton: {
-    flex: 1,
-    backgroundColor: '#2E7D32',
-    borderRadius: 8,
+  cancelButton: {
     paddingVertical: 14,
     alignItems: 'center',
+    marginTop: 8,
   },
 
-  saveButtonText: {
-    color: '#FFFFFF',
+  cancelText: {
+    color: '#333333',
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '500',
+  },
+
+  errorText: {
+    color: '#C62828',
+    fontSize: 14,
+    marginTop: 12,
   },
 });
 
