@@ -20,6 +20,7 @@ type MenuItem = {
 
 function App() {
   const [screen, setScreen] = useState('home');
+const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const [dishName, setDishName] = useState('');
   const [description, setDescription] = useState('');
@@ -42,6 +43,12 @@ function App() {
     setError('');
     setSuccessMessage('');
   };
+  const showDetails = (item: MenuItem) => {
+  setSelectedItem(item);
+  setScreen('details');
+  setError('');
+  setSuccessMessage('');
+};
 
   const saveMenuItem = () => {
     if (dishName.trim() === '') {
@@ -87,7 +94,9 @@ function App() {
 
   const renderMenuItem = ({item}: {item: MenuItem}) => {
     return (
-      <View style={styles.menuCard}>
+  <TouchableOpacity
+    style={styles.menuCard}
+    onPress={() => showDetails(item)}>
         <View style={styles.menuHeader}>
           <Text style={styles.dishName}>{item.name}</Text>
 
@@ -97,7 +106,7 @@ function App() {
         <Text style={styles.course}>{item.course}</Text>
 
         <Text style={styles.description}>{item.description}</Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -243,6 +252,47 @@ function App() {
           </TouchableOpacity>
         </View>
       )}
+            {screen === 'details' && selectedItem && (
+        <View style={styles.content}>
+          <Text style={styles.title}>Menu Item Details</Text>
+
+          <View style={styles.detailsCard}>
+            <Text style={styles.detailsLabel}>Dish Name</Text>
+            <Text style={styles.detailsValue}>
+              {selectedItem.name}
+            </Text>
+
+            <Text style={styles.detailsLabel}>Description</Text>
+            <Text style={styles.detailsValue}>
+              {selectedItem.description}
+            </Text>
+
+            <Text style={styles.detailsLabel}>Course</Text>
+            <Text style={styles.detailsValue}>
+              {selectedItem.course}
+            </Text>
+
+            <Text style={styles.detailsLabel}>Price</Text>
+            <Text style={styles.detailsValue}>
+              R{selectedItem.price}
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={() => {
+              // Edit screen will be added next
+            }}>
+            <Text style={styles.buttonText}>Edit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={showHome}>
+            <Text style={styles.cancelText}>Back</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -288,6 +338,27 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 15,
     color: '#777777',
+  },
+
+  detailsCard: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 12,
+    marginTop: 10,
+  },
+
+  detailsLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666666',
+    marginTop: 12,
+    marginBottom: 5,
+  },
+
+  detailsValue: {
+    fontSize: 16,
+    color: '#222222',
+    lineHeight: 22,
   },
 
   successCard: {
