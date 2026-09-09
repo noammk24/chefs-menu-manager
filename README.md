@@ -364,6 +364,8 @@ https://youtu.be/k82V3IpaerM
 **ST10517736**
 
 QUALIFICATION: Higher Certificate in Mobile Application and Web Development
+
+
 COURSE NAME : Mobile App scripting 
 
 ---
