@@ -347,19 +347,23 @@ Possible future improvements to the application could include:
 
 ---
 
-## Repository
+## Repository and video demonstration 
 
 GitHub Repository:
 
 https://github.com/noammk24/chefs-menu-manager
 
+link video youtube:
+
+https://youtu.be/k82V3IpaerM
 ---
 
 ## Author
 
 **MULENGA NOAM KABEKE**
 
-Higher Certificate in Mobile Application and Web Development
+QUALIFICATION: Higher Certificate in Mobile Application and Web Development
+COURSE NAME : Mobile App scripting 
 
 ---
 
