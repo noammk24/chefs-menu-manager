@@ -49,6 +49,65 @@ const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   setError('');
   setSuccessMessage('');
 };
+const showEdit = () => {
+  if (selectedItem) {
+    setDishName(selectedItem.name);
+    setDescription(selectedItem.description);
+    setCourse(selectedItem.course);
+    setPrice(selectedItem.price);
+
+    setError('');
+    setSuccessMessage('');
+    setScreen('edit');
+  }
+};
+  const updateMenuItem = () => {
+    if (!selectedItem) {
+      return;
+    }
+
+    if (dishName.trim() === '') {
+      setError('Please enter a dish name.');
+      return;
+    }
+
+    if (description.trim() === '') {
+      setError('Please enter a description.');
+      return;
+    }
+
+    if (course.trim() === '') {
+      setError('Please select a course.');
+      return;
+    }
+
+    if (price.trim() === '' || isNaN(Number(price))) {
+      setError('Please enter a valid price.');
+      return;
+    }
+
+    const updatedItem: MenuItem = {
+      id: selectedItem.id,
+      name: dishName.trim(),
+      description: description.trim(),
+      course,
+      price: price.trim(),
+    };
+
+    setMenuItems(currentItems =>
+      currentItems.map(item =>
+        item.id === selectedItem.id ? updatedItem : item,
+      ),
+    );
+    setSelectedItem(updatedItem);
+    setDishName('');
+    setDescription('');
+    setCourse('');
+    setPrice('');
+    setError('');
+    setSuccessMessage('Menu item updated successfully!');
+    setScreen('home');
+  };
 
   const saveMenuItem = () => {
     if (dishName.trim() === '') {
@@ -277,15 +336,117 @@ const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
               R{selectedItem.price}
             </Text>
           </View>
-
+          
           <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={() => {
-              // Edit screen will be added next
-            }}>
-            <Text style={styles.buttonText}>Edit</Text>
+          style={styles.primaryButton}
+          onPress={showEdit}>
+          <Text style={styles.buttonText}>Edit</Text>
+        </TouchableOpacity>
+            <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={showHome}>
+          <Text style={styles.cancelText}>Back</Text>
+        </TouchableOpacity>
+      </View>
+      )}
+
+      {screen === 'edit' && selectedItem && (
+        <View style={styles.content}>
+          <Text style={styles.title}>Edit Menu Item</Text>
+
+        <Text style={styles.label}>Dish Name</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter dish name"
+          value={dishName}
+          onChangeText={setDishName}
+        />
+
+        <Text style={styles.label}>Description</Text>
+
+        <TextInput
+          style={[styles.input, styles.descriptionInput]}
+          placeholder="Enter dish description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+
+        <Text style={styles.label}>Course</Text>
+
+        <View style={styles.courseContainer}>
+          <TouchableOpacity
+            style={[
+              styles.courseButton,
+              course === 'Starter' && styles.selectedCourse,
+            ]}
+            onPress={() => setCourse('Starter')}>
+            <Text
+              style={[
+                styles.courseText,
+                course === 'Starter' && styles.selectedCourseText,
+              ]}>
+              Starter
+            </Text>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={[
+              styles.courseButton,
+              course === 'Main Course' && styles.selectedCourse,
+            ]}
+            onPress={() => setCourse('Main Course')}>
+            <Text
+              style={[
+                styles.courseText,
+                course === 'Main Course' && styles.selectedCourseText,
+              ]}>
+              Main Course
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.courseButton,
+              course === 'Dessert' && styles.selectedCourse,
+            ]}
+            onPress={() => setCourse('Dessert')}>
+            <Text
+              style={[
+                styles.courseText,
+                course === 'Dessert' && styles.selectedCourseText,
+              ]}>
+              Dessert
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.label}>Price</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter price"
+          keyboardType="numeric"
+          value={price}
+          onChangeText={setPrice}
+        />
+
+        {error !== '' && (
+          <Text style={styles.errorText}>{error}</Text>
+        )}
+// update menu item button
+        <TouchableOpacity
+  style={styles.primaryButton}
+  onPress={updateMenuItem}>
+  <Text style={styles.buttonText}>Update Menu Item</Text>
+</TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => setScreen('details')}>
+          <Text style={styles.cancelText}>Cancel</Text>
+        </TouchableOpacity>
           <TouchableOpacity
             style={styles.cancelButton}
             onPress={showHome}>
