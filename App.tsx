@@ -182,6 +182,27 @@ const showEdit = () => {
 
   return matchesSearch && matchesCourse;
 });
+const totalMenuItems = menuItems.length;
+
+const totalPrice = menuItems.reduce(
+  (total, item) => total + Number(item.price),
+  0,
+);
+
+const averagePrice =
+  totalMenuItems > 0 ? totalPrice / totalMenuItems : 0;
+
+const starterCount = menuItems.filter(
+  item => item.course === 'Starter',
+).length;
+
+const mainCourseCount = menuItems.filter(
+  item => item.course === 'Main Course',
+).length;
+
+const dessertCount = menuItems.filter(
+  item => item.course === 'Dessert',
+).length;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -190,6 +211,69 @@ const showEdit = () => {
       {screen === 'home' && (
         <View style={styles.content}>
           <Text style={styles.title}>Restaurant Menu Manager</Text>
+          <View style={styles.statisticsCard}>
+  <Text style={styles.statisticsTitle}>
+    Menu Overview
+  </Text>
+
+  <View style={styles.statisticsRow}>
+    <View style={styles.statisticBox}>
+      <Text style={styles.statisticNumber}>
+        {totalMenuItems}
+      </Text>
+
+      <Text style={styles.statisticLabel}>
+        Total Items
+      </Text>
+    </View>
+
+    <View style={styles.statisticBox}>
+      <Text style={styles.statisticNumber}>
+        R {averagePrice.toFixed(2)}
+      </Text>
+
+      <Text style={styles.statisticLabel}>
+        Average Price
+      </Text>
+    </View>
+  </View>
+
+  <Text style={styles.courseOverviewTitle}>
+    Items by Course
+  </Text>
+
+  <View style={styles.courseOverviewRow}>
+    <View style={styles.courseOverviewItem}>
+      <Text style={styles.courseNumber}>
+        {starterCount}
+      </Text>
+
+      <Text style={styles.courseName}>
+        Starters
+      </Text>
+    </View>
+
+    <View style={styles.courseOverviewItem}>
+      <Text style={styles.courseNumber}>
+        {mainCourseCount}
+      </Text>
+
+      <Text style={styles.courseName}>
+        Main Courses
+      </Text>
+    </View>
+
+    <View style={styles.courseOverviewItem}>
+      <Text style={styles.courseNumber}>
+        {dessertCount}
+      </Text>
+
+      <Text style={styles.courseName}>
+        Desserts
+      </Text>
+    </View>
+  </View>
+</View>
 <Text style={styles.sectionTitle}>Menu Items</Text>
 
 <TextInput
@@ -834,6 +918,79 @@ clearText: {
   color: '#2E7D32',
   fontSize: 14,
   fontWeight: '600',
+},
+statisticsCard: {
+  backgroundColor: '#FFFFFF',
+  padding: 18,
+  borderRadius: 12,
+  marginTop: 16,
+},
+
+statisticsTitle: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#222',
+  marginBottom: 14,
+},
+
+statisticsRow: {
+  flexDirection: 'row',
+  gap: 10,
+},
+
+statisticBox: {
+  flex: 1,
+  backgroundColor: '#F7F7F7',
+  padding: 14,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+
+statisticNumber: {
+  fontSize: 20,
+  fontWeight: '700',
+  color: '#2E7D32',
+  marginBottom: 4,
+},
+
+statisticLabel: {
+  fontSize: 12,
+  color: '#666',
+  textAlign: 'center',
+},
+
+courseOverviewTitle: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#333',
+  marginTop: 18,
+  marginBottom: 10,
+},
+
+courseOverviewRow: {
+  flexDirection: 'row',
+  gap: 8,
+},
+
+courseOverviewItem: {
+  flex: 1,
+  backgroundColor: '#F7F7F7',
+  paddingVertical: 12,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+
+courseNumber: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#2E7D32',
+  marginBottom: 3,
+},
+
+courseName: {
+  fontSize: 11,
+  color: '#666',
+  textAlign: 'center',
 },
 });
 
