@@ -32,6 +32,8 @@ const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   const [successMessage, setSuccessMessage] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [selectedCourseFilter, setSelectedCourseFilter] = useState('');
 
   const showHome = () => {
     setScreen('home');
@@ -169,6 +171,18 @@ const showEdit = () => {
     );
   };
 
+  const filteredMenuItems = menuItems.filter(item => {
+  const matchesSearch = item.name
+    .toLowerCase()
+    .includes(searchText.toLowerCase());
+
+  const matchesCourse =
+    selectedCourseFilter === '' ||
+    item.course === selectedCourseFilter;
+
+  return matchesSearch && matchesCourse;
+});
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -176,10 +190,97 @@ const showEdit = () => {
       {screen === 'home' && (
         <View style={styles.content}>
           <Text style={styles.title}>Restaurant Menu Manager</Text>
+<Text style={styles.sectionTitle}>Menu Items</Text>
 
-          <Text style={styles.subtitle}>
-            Manage your restaurant menu easily
-          </Text>
+<TextInput
+  style={styles.input}
+  placeholder="Search menu by name"
+  value={searchText}
+  onChangeText={setSearchText}
+/>
+
+<Text style={styles.filterLabel}>Filter by Course</Text>
+
+<View style={styles.filterContainer}>
+  <TouchableOpacity
+    style={
+      selectedCourseFilter === ''
+        ? styles.selectedFilterButton
+        : styles.filterButton
+    }
+    onPress={() => setSelectedCourseFilter('')}>
+    <Text
+      style={
+        selectedCourseFilter === ''
+          ? styles.selectedFilterText
+          : styles.filterText
+      }>
+      All
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={
+      selectedCourseFilter === 'Starter'
+        ? styles.selectedFilterButton
+        : styles.filterButton
+    }
+    onPress={() => setSelectedCourseFilter('Starter')}>
+    <Text
+      style={
+        selectedCourseFilter === 'Starter'
+          ? styles.selectedFilterText
+          : styles.filterText
+      }>
+      Starter
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={
+      selectedCourseFilter === 'Main Course'
+        ? styles.selectedFilterButton
+        : styles.filterButton
+    }
+    onPress={() => setSelectedCourseFilter('Main Course')}>
+    <Text
+      style={
+        selectedCourseFilter === 'Main Course'
+          ? styles.selectedFilterText
+          : styles.filterText
+      }>
+      Main Course
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={
+      selectedCourseFilter === 'Dessert'
+        ? styles.selectedFilterButton
+        : styles.filterButton
+    }
+    onPress={() => setSelectedCourseFilter('Dessert')}>
+    <Text
+      style={
+        selectedCourseFilter === 'Dessert'
+          ? styles.selectedFilterText
+          : styles.filterText
+      }>
+      Dessert
+    </Text>
+  </TouchableOpacity>
+</View>
+
+<TouchableOpacity
+  style={styles.clearButton}
+  onPress={() => {
+    setSearchText('');
+    setSelectedCourseFilter('');
+  }}>
+  <Text style={styles.clearText}>
+    Clear Search & Filter
+  </Text>
+</TouchableOpacity>
 
           {successMessage !== '' && (
             <View style={styles.successCard}>
@@ -187,7 +288,7 @@ const showEdit = () => {
             </View>
           )}
 
-          {menuItems.length === 0 ? (
+          {filteredMenuItems.length === 0 ? (
             <View style={styles.emptyCard}>
               <Text style={styles.emptyTitle}>No menu items</Text>
 
@@ -197,7 +298,7 @@ const showEdit = () => {
             </View>
           ) : (
             <FlatList
-              data={menuItems}
+              data={filteredMenuItems}
               keyExtractor={item => item.id}
               renderItem={renderMenuItem}
               showsVerticalScrollIndicator={false}
@@ -476,6 +577,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 12,
+  },
+
   subtitle: {
     fontSize: 15,
     color: '#666666',
@@ -602,6 +710,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
+  courseButtons: {
+    flexDirection: 'row',
+    flex: 1,
+    marginLeft: 12,
+  },
+
   courseButton: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -659,6 +773,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 12,
   },
+ filterLabel: {
+  fontSize: 15,
+  fontWeight: '600',
+  color: '#333',
+  marginTop: 16,
+  marginBottom: 10,
+},
+
+filterContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+},
+
+filterButton: {
+  borderWidth: 1,
+  borderColor: '#CCCCCC',
+  borderRadius: 8,
+  paddingVertical: 10,
+  paddingHorizontal: 10,
+  backgroundColor: '#FFFFFF',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+selectedFilterButton: {
+  width: 78,
+  borderWidth: 1,
+  borderColor: '#2E7D32',
+  borderRadius: 8,
+  paddingVertical: 10,
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#E8F5E9',
+},
+
+filterText: {
+  color: '#555',
+  fontSize: 13,
+},
+
+selectedFilterText: {
+  color: '#2E7D32',
+  fontSize: 13,
+  fontWeight: '600',
+},
+
+clearButton: {
+  borderWidth: 1,
+  borderColor: '#2E7D32',
+  borderRadius: 8,
+  paddingVertical: 10,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: 10,
+},
+
+clearText: {
+  color: '#2E7D32',
+  fontSize: 14,
+  fontWeight: '600',
+},
 });
 
 export default App;
