@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import MenuCard from './components/MenuCard';
+import StatisticCard from './components/StatisticCard';
 
 type MenuItem = {
   id: string;
@@ -209,24 +210,14 @@ const dessertCount = menuItems.filter(
   </Text>
 
   <View style={styles.statisticsRow}>
-    <View style={styles.statisticBox}>
-      <Text style={styles.statisticNumber}>
-        {totalMenuItems}
-      </Text>
-
-      <Text style={styles.statisticLabel}>
-        Total Items
-      </Text>
-    </View>
-
-    <View style={styles.statisticBox}>
-      <Text style={styles.statisticNumber}>
-        R {averagePrice.toFixed(2)}
-      </Text>
-
-      <Text style={styles.statisticLabel}>
-        Average Price
-      </Text>
+    <StatisticCard
+  title="Total Items"
+  value={totalMenuItems}
+/>
+    <StatisticCard
+  title="Average Price"
+  value={`R ${averagePrice.toFixed(2)}`}
+/>
     </View>
   </View>
 
@@ -265,7 +256,6 @@ const dessertCount = menuItems.filter(
       </Text>
     </View>
   </View>
-</View>
 <Text style={styles.sectionTitle}>Menu Items</Text>
 
 <TextInput
@@ -889,27 +879,6 @@ statisticsTitle: {
 statisticsRow: {
   flexDirection: 'row',
   gap: 10,
-},
-
-statisticBox: {
-  flex: 1,
-  backgroundColor: '#F7F7F7',
-  padding: 14,
-  borderRadius: 8,
-  alignItems: 'center',
-},
-
-statisticNumber: {
-  fontSize: 20,
-  fontWeight: '700',
-  color: '#2E7D32',
-  marginBottom: 4,
-},
-
-statisticLabel: {
-  fontSize: 12,
-  color: '#666',
-  textAlign: 'center',
 },
 
 courseOverviewTitle: {
