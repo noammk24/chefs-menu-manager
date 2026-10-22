@@ -12,6 +12,7 @@ import {
 import MenuCard from './components/MenuCard';
 import StatisticCard from './components/StatisticCard';
 import CourseStatistics from './components/CourseStatistics';
+import AppButton from './components/AppButton';
 
 type MenuItem = {
   id: string;
@@ -342,11 +343,10 @@ const dessertCount = menuItems.filter(
             />
           )}
 
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={showAddMenu}>
-            <Text style={styles.buttonText}>Add Menu Item</Text>
-          </TouchableOpacity>
+          <AppButton
+  title="Add Menu Item"
+  onPress={showAddMenu}
+/>
         </View>
       )}
 
@@ -436,17 +436,16 @@ const dessertCount = menuItems.filter(
             <Text style={styles.errorText}>{error}</Text>
           )}
 
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={saveMenuItem}>
-            <Text style={styles.buttonText}>Save Menu Item</Text>
-          </TouchableOpacity>
+       <AppButton
+  title="Save Menu Item"
+  onPress={saveMenuItem}
+/>
 
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={showHome}>
-            <Text style={styles.cancelText}>Cancel</Text>
-          </TouchableOpacity>
+         <AppButton
+  title="Cancel"
+  type="cancel"
+  onPress={showHome}
+/>
         </View>
       )}
             {screen === 'details' && selectedItem && (
@@ -475,16 +474,15 @@ const dessertCount = menuItems.filter(
             </Text>
           </View>
           
-          <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={showEdit}>
-          <Text style={styles.buttonText}>Edit</Text>
-        </TouchableOpacity>
-            <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={showHome}>
-          <Text style={styles.cancelText}>Back</Text>
-        </TouchableOpacity>
+         <AppButton
+  title="Edit Menu Item"
+  onPress={showEdit}
+/>
+            <AppButton
+  title="Back"
+  type="cancel"
+  onPress={showHome}
+/>
       </View>
       )}
 
@@ -574,11 +572,10 @@ const dessertCount = menuItems.filter(
           <Text style={styles.errorText}>{error}</Text>
         )}
 // update menu item button
-        <TouchableOpacity
-  style={styles.primaryButton}
-  onPress={updateMenuItem}>
-  <Text style={styles.buttonText}>Update Menu Item</Text>
-</TouchableOpacity>
+  <AppButton
+  title="Update Menu Item"
+  onPress={updateMenuItem}
+/>
 
         <TouchableOpacity
           style={styles.cancelButton}
