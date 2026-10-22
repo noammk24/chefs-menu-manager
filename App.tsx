@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 import {
   SafeAreaView,
+  Alert,
   StatusBar,
   StyleSheet,
+  Image,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,6 +16,7 @@ import MenuCard from './components/MenuCard';
 import StatisticCard from './components/StatisticCard';
 import CourseStatistics from './components/CourseStatistics';
 import AppButton from './components/AppButton';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 type MenuItem = {
   id: string;
@@ -20,6 +24,7 @@ type MenuItem = {
   description: string;
   course: string;
   price: string;
+  image?: string;
 };
 
 function App() {
@@ -30,6 +35,9 @@ const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [description, setDescription] = useState('');
   const [course, setCourse] = useState('');
   const [price, setPrice] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(
+  undefined,
+);
 
   const [error, setError] = useState('');
 
@@ -46,6 +54,7 @@ const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   const showAddMenu = () => {
     setScreen('add');
+    setSelectedImage(undefined);
     setError('');
     setSuccessMessage('');
   };
@@ -61,6 +70,7 @@ const showEdit = () => {
     setDescription(selectedItem.description);
     setCourse(selectedItem.course);
     setPrice(selectedItem.price);
+    setSelectedImage(selectedItem.image);
 
     setError('');
     setSuccessMessage('');
@@ -98,6 +108,7 @@ const showEdit = () => {
       description: description.trim(),
       course,
       price: price.trim(),
+      image: selectedImage,
     };
 
     setMenuItems(currentItems =>
@@ -110,11 +121,49 @@ const showEdit = () => {
     setDescription('');
     setCourse('');
     setPrice('');
+    setSelectedImage(undefined);
     setError('');
     setSuccessMessage('Menu item updated successfully!');
     setScreen('home');
   };
+const selectDishImage = async () => {
+  try {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      selectionLimit: 1,
+    });
 
+    if (result.didCancel) {
+      return;
+    }
+
+    if (result.errorCode) {
+      Alert.alert(
+        'Unable to select photo',
+        result.errorMessage || 'Please try again.',
+      );
+      return;
+    }
+
+    const imageUri = result.assets?.[0]?.uri;
+    if (!imageUri) {
+      Alert.alert(
+        'Unable to select photo',
+        'No photo was returned. Please choose another photo.',
+      );
+      return;
+    }
+
+    setSelectedImage(imageUri);
+  } catch (pickerError) {
+    Alert.alert(
+      'Unable to select photo',
+      pickerError instanceof Error
+        ? pickerError.message
+        : 'Please try again.',
+    );
+  }
+};
   const saveMenuItem = () => {
     if (dishName.trim() === '') {
       setError('Please enter a dish name.');
@@ -137,12 +186,13 @@ const showEdit = () => {
     }
 
     const newMenuItem: MenuItem = {
-      id: Date.now().toString(),
-      name: dishName.trim(),
-      description: description.trim(),
-      course: course,
-      price: price.trim(),
-    };
+  id: Date.now().toString(),
+  name: dishName.trim(),
+  description: description.trim(),
+  course: course,
+  price: price.trim(),
+  image: selectedImage,
+};
 
     setMenuItems(currentItems => [...currentItems, newMenuItem]);
 
@@ -150,6 +200,7 @@ const showEdit = () => {
     setDescription('');
     setCourse('');
     setPrice('');
+    setSelectedImage(undefined);
     setError('');
 
     setSuccessMessage('Menu item saved successfully!');
@@ -165,6 +216,29 @@ const showEdit = () => {
     />
   );
 };
+
+const renderImagePicker = () => (
+  <View style={styles.imagePickerContainer}>
+    <AppButton
+      title={selectedImage ? 'Change Picture' : 'Upload Picture'}
+      onPress={selectDishImage}
+    />
+    {selectedImage && (
+      <>
+        <Image
+          source={{uri: selectedImage}}
+          style={styles.dishImage}
+          resizeMode="cover"
+        />
+        <AppButton
+          title="Remove Picture"
+          type="cancel"
+          onPress={() => setSelectedImage(undefined)}
+        />
+      </>
+    )}
+  </View>
+);
 
   const filteredMenuItems = menuItems.filter(item => {
   const matchesSearch = item.name
@@ -351,7 +425,7 @@ const dessertCount = menuItems.filter(
       )}
 
       {screen === 'add' && (
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.formContent}>
           <Text style={styles.title}>Add Menu Item</Text>
 
           <Text style={styles.label}>Dish Name</Text>
@@ -435,7 +509,7 @@ const dessertCount = menuItems.filter(
           {error !== '' && (
             <Text style={styles.errorText}>{error}</Text>
           )}
-
+          {renderImagePicker()}
        <AppButton
   title="Save Menu Item"
   onPress={saveMenuItem}
@@ -446,13 +520,20 @@ const dessertCount = menuItems.filter(
   type="cancel"
   onPress={showHome}
 />
-        </View>
+        </ScrollView>
       )}
             {screen === 'details' && selectedItem && (
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.formContent}>
           <Text style={styles.title}>Menu Item Details</Text>
 
           <View style={styles.detailsCard}>
+            {selectedItem.image && (
+              <Image
+                source={{uri: selectedItem.image}}
+                style={styles.dishImage}
+                resizeMode="cover"
+              />
+            )}
             <Text style={styles.detailsLabel}>Dish Name</Text>
             <Text style={styles.detailsValue}>
               {selectedItem.name}
@@ -483,11 +564,11 @@ const dessertCount = menuItems.filter(
   type="cancel"
   onPress={showHome}
 />
-      </View>
+      </ScrollView>
       )}
 
       {screen === 'edit' && selectedItem && (
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.formContent}>
           <Text style={styles.title}>Edit Menu Item</Text>
 
         <Text style={styles.label}>Dish Name</Text>
@@ -571,7 +652,7 @@ const dessertCount = menuItems.filter(
         {error !== '' && (
           <Text style={styles.errorText}>{error}</Text>
         )}
-// update menu item button
+        {renderImagePicker()}
   <AppButton
   title="Update Menu Item"
   onPress={updateMenuItem}
@@ -587,7 +668,7 @@ const dessertCount = menuItems.filter(
             onPress={showHome}>
             <Text style={styles.cancelText}>Back</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );
@@ -602,6 +683,22 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 24,
+  },
+
+  formContent: {
+    flexGrow: 1,
+    padding: 24,
+  },
+
+  imagePickerContainer: {
+    marginTop: 8,
+  },
+
+  dishImage: {
+    width: '100%',
+    height: 200,
+    marginTop: 10,
+    borderRadius: 8,
   },
 
   title: {

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Image,
   Text,
   TouchableOpacity,
   View,
@@ -12,6 +13,7 @@ type MenuItem = {
   description: string;
   course: string;
   price: string;
+  image?: string;
 };
 
 type MenuCardProps = {
@@ -24,6 +26,14 @@ const MenuCard = ({item, onPress}: MenuCardProps) => {
     <TouchableOpacity
       style={styles.menuCard}
       onPress={onPress}>
+
+      {item.image && (
+        <Image
+          source={{uri: item.image}}
+          style={styles.dishImage}
+          resizeMode="cover"
+        />
+      )}
 
       <View style={styles.menuHeader}>
         <Text style={styles.dishName}>
@@ -52,6 +62,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 18,
     borderRadius: 12,
+    marginBottom: 12,
+  },
+
+  dishImage: {
+    width: '100%',
+    height: 160,
+    borderRadius: 8,
     marginBottom: 12,
   },
 
