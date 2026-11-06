@@ -14,6 +14,7 @@ The application allows the chef to:
 - View existing menu items
 - View detailed information about a menu item
 - Edit existing menu items
+- Add a picture to a menu item
 - Validate required information
 - Receive feedback when an item is successfully saved
 - Display a suitable message when no menu items have been added
@@ -24,6 +25,7 @@ Each menu item contains the following information:
 - Description
 - Course
 - Price
+- Optional Picture
 
 ---
 
@@ -65,6 +67,9 @@ The chef can enter:
 - Description
 - Course
 - Price
+- An optional picture selected from the device's photo library
+
+The selected picture is previewed before the menu item is saved.
 
 The available course options are:
 
@@ -111,6 +116,11 @@ The chef can update:
 - Description
 - Course
 - Price
+- Picture (change or remove it)
+
+### 7. Menu Item Pictures
+
+The chef can choose one picture from the device's photo library when adding or editing a menu item. The picture can be previewed, changed, or removed, and is displayed with the menu item on the Home screen and details screen.
 
 ---
 
@@ -126,6 +136,7 @@ The interface includes:
 - Course selection
 - Buttons for actions
 - Menu item cards
+- Dish pictures
 - Validation messages
 - Success feedback
 - Empty-state feedback
@@ -288,21 +299,24 @@ The following functions should be tested.
 - [ ] Enter a valid description.
 - [ ] Select a course.
 - [ ] Enter a valid price.
+- [ ] Optionally select a picture and check its preview.
 - [ ] Save the menu item.
 - [ ] Check that the success message is displayed.
-- [ ] Check that the new menu item appears on the Home screen.
+- [ ] Check that the new menu item and its picture appear on the Home screen.
 
 ### Viewing a Menu Item
 
 - [ ] Select an existing menu item.
 - [ ] Check that the menu item details are displayed correctly.
 - [ ] Verify the dish name, description, course, and price.
+- [ ] Check that the dish picture is displayed, if one was added.
 
 ### Editing a Menu Item
 
 - [ ] Select an existing menu item.
 - [ ] Select the edit option.
 - [ ] Change one or more fields.
+- [ ] Change or remove the picture, if desired.
 - [ ] Save the changes.
 - [ ] Verify that the updated information is displayed.
 
@@ -336,7 +350,6 @@ The application focuses on keeping the interface simple and allowing the chef to
 Possible future improvements to the application could include:
 
 - Persistent database storage
-- Menu item images
 - Search functionality
 - Filtering menu items by course
 - Sorting menu items by price

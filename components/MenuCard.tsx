@@ -1,11 +1,11 @@
 import React from 'react';
 import {
-  Image,
   Text,
   TouchableOpacity,
   View,
   StyleSheet,
 } from 'react-native';
+import MenuItemImage from './MenuItemImage';
 
 type MenuItem = {
   id: string;
@@ -27,13 +27,11 @@ const MenuCard = ({item, onPress}: MenuCardProps) => {
       style={styles.menuCard}
       onPress={onPress}>
 
-      {item.image && (
-        <Image
-          source={{uri: item.image}}
-          style={styles.dishImage}
-          resizeMode="cover"
-        />
-      )}
+      <MenuItemImage
+        imageUri={item.image}
+        height={160}
+        marginBottom={12}
+      />
 
       <View style={styles.menuHeader}>
         <Text style={styles.dishName}>
@@ -62,13 +60,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     padding: 18,
     borderRadius: 12,
-    marginBottom: 12,
-  },
-
-  dishImage: {
-    width: '100%',
-    height: 160,
-    borderRadius: 8,
     marginBottom: 12,
   },
 

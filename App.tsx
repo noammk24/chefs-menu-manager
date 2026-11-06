@@ -4,10 +4,8 @@ import {
   Alert,
   StatusBar,
   StyleSheet,
-  Image,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   FlatList,
@@ -16,6 +14,11 @@ import MenuCard from './components/MenuCard';
 import StatisticCard from './components/StatisticCard';
 import CourseStatistics from './components/CourseStatistics';
 import AppButton from './components/AppButton';
+import SearchBar from './components/SearchBar';
+import CourseFilter from './components/CourseFilter';
+import EmptyState from './components/EmptyState';
+import MenuItemImage from './components/MenuItemImage';
+import MenuItemForm from './components/MenuItemForm';
 import {launchImageLibrary} from 'react-native-image-picker';
 
 type MenuItem = {
@@ -217,29 +220,6 @@ const selectDishImage = async () => {
   );
 };
 
-const renderImagePicker = () => (
-  <View style={styles.imagePickerContainer}>
-    <AppButton
-      title={selectedImage ? 'Change Picture' : 'Upload Picture'}
-      onPress={selectDishImage}
-    />
-    {selectedImage && (
-      <>
-        <Image
-          source={{uri: selectedImage}}
-          style={styles.dishImage}
-          resizeMode="cover"
-        />
-        <AppButton
-          title="Remove Picture"
-          type="cancel"
-          onPress={() => setSelectedImage(undefined)}
-        />
-      </>
-    )}
-  </View>
-);
-
   const filteredMenuItems = menuItems.filter(item => {
   const matchesSearch = item.name
     .toLowerCase()
@@ -304,84 +284,12 @@ const dessertCount = menuItems.filter(
 />
 <Text style={styles.sectionTitle}>Menu Items</Text>
 
-<TextInput
-  style={styles.input}
-  placeholder="Search menu by name"
-  value={searchText}
-  onChangeText={setSearchText}
+<SearchBar value={searchText} onChangeText={setSearchText} />
+
+<CourseFilter
+  selectedCourse={selectedCourseFilter}
+  onSelectCourse={setSelectedCourseFilter}
 />
-
-<Text style={styles.filterLabel}>Filter by Course</Text>
-
-<View style={styles.filterContainer}>
-  <TouchableOpacity
-    style={
-      selectedCourseFilter === ''
-        ? styles.selectedFilterButton
-        : styles.filterButton
-    }
-    onPress={() => setSelectedCourseFilter('')}>
-    <Text
-      style={
-        selectedCourseFilter === ''
-          ? styles.selectedFilterText
-          : styles.filterText
-      }>
-      All
-    </Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={
-      selectedCourseFilter === 'Starter'
-        ? styles.selectedFilterButton
-        : styles.filterButton
-    }
-    onPress={() => setSelectedCourseFilter('Starter')}>
-    <Text
-      style={
-        selectedCourseFilter === 'Starter'
-          ? styles.selectedFilterText
-          : styles.filterText
-      }>
-      Starter
-    </Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={
-      selectedCourseFilter === 'Main Course'
-        ? styles.selectedFilterButton
-        : styles.filterButton
-    }
-    onPress={() => setSelectedCourseFilter('Main Course')}>
-    <Text
-      style={
-        selectedCourseFilter === 'Main Course'
-          ? styles.selectedFilterText
-          : styles.filterText
-      }>
-      Main Course
-    </Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    style={
-      selectedCourseFilter === 'Dessert'
-        ? styles.selectedFilterButton
-        : styles.filterButton
-    }
-    onPress={() => setSelectedCourseFilter('Dessert')}>
-    <Text
-      style={
-        selectedCourseFilter === 'Dessert'
-          ? styles.selectedFilterText
-          : styles.filterText
-      }>
-      Dessert
-    </Text>
-  </TouchableOpacity>
-</View>
 
 <TouchableOpacity
   style={styles.clearButton}
@@ -401,13 +309,11 @@ const dessertCount = menuItems.filter(
           )}
 
           {filteredMenuItems.length === 0 ? (
-            <View style={styles.emptyCard}>
-              <Text style={styles.emptyTitle}>No menu items</Text>
-
-              <Text style={styles.emptyText}>
-                No menu items have been added yet.
-              </Text>
-            </View>
+            <EmptyState
+              hasMenuItems={menuItems.length > 0}
+              searchText={searchText}
+              selectedCourse={selectedCourseFilter}
+            />
           ) : (
             <FlatList
               data={filteredMenuItems}
@@ -425,115 +331,34 @@ const dessertCount = menuItems.filter(
       )}
 
       {screen === 'add' && (
-        <ScrollView contentContainerStyle={styles.formContent}>
-          <Text style={styles.title}>Add Menu Item</Text>
-
-          <Text style={styles.label}>Dish Name</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Enter dish name"
-            value={dishName}
-            onChangeText={setDishName}
-          />
-
-          <Text style={styles.label}>Description</Text>
-
-          <TextInput
-            style={[styles.input, styles.descriptionInput]}
-            placeholder="Enter dish description"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-          />
-
-          <Text style={styles.label}>Course</Text>
-
-          <View style={styles.courseContainer}>
-            <TouchableOpacity
-              style={[
-                styles.courseButton,
-                course === 'Starter' && styles.selectedCourse,
-              ]}
-              onPress={() => setCourse('Starter')}>
-              <Text
-                style={[
-                  styles.courseText,
-                  course === 'Starter' && styles.selectedCourseText,
-                ]}>
-                Starter
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.courseButton,
-                course === 'Main Course' && styles.selectedCourse,
-              ]}
-              onPress={() => setCourse('Main Course')}>
-              <Text
-                style={[
-                  styles.courseText,
-                  course === 'Main Course' && styles.selectedCourseText,
-                ]}>
-                Main Course
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.courseButton,
-                course === 'Dessert' && styles.selectedCourse,
-              ]}
-              onPress={() => setCourse('Dessert')}>
-              <Text
-                style={[
-                  styles.courseText,
-                  course === 'Dessert' && styles.selectedCourseText,
-                ]}>
-                Dessert
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.label}>Price</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Enter price"
-            keyboardType="numeric"
-            value={price}
-            onChangeText={setPrice}
-          />
-
-          {error !== '' && (
-            <Text style={styles.errorText}>{error}</Text>
-          )}
-          {renderImagePicker()}
-       <AppButton
-  title="Save Menu Item"
-  onPress={saveMenuItem}
-/>
-
-         <AppButton
-  title="Cancel"
-  type="cancel"
-  onPress={showHome}
-/>
-        </ScrollView>
+        <MenuItemForm
+          mode="add"
+          dishName={dishName}
+          onDishNameChange={setDishName}
+          description={description}
+          onDescriptionChange={setDescription}
+          course={course}
+          onCourseChange={setCourse}
+          price={price}
+          onPriceChange={setPrice}
+          error={error}
+          imageUri={selectedImage}
+          onSelectImage={selectDishImage}
+          onRemoveImage={() => setSelectedImage(undefined)}
+          onSave={saveMenuItem}
+          onCancel={showHome}
+        />
       )}
             {screen === 'details' && selectedItem && (
         <ScrollView contentContainerStyle={styles.formContent}>
           <Text style={styles.title}>Menu Item Details</Text>
 
           <View style={styles.detailsCard}>
-            {selectedItem.image && (
-              <Image
-                source={{uri: selectedItem.image}}
-                style={styles.dishImage}
-                resizeMode="cover"
-              />
-            )}
+            <MenuItemImage
+              imageUri={selectedItem.image}
+              height={200}
+              marginTop={10}
+            />
             <Text style={styles.detailsLabel}>Dish Name</Text>
             <Text style={styles.detailsValue}>
               {selectedItem.name}
@@ -568,107 +393,24 @@ const dessertCount = menuItems.filter(
       )}
 
       {screen === 'edit' && selectedItem && (
-        <ScrollView contentContainerStyle={styles.formContent}>
-          <Text style={styles.title}>Edit Menu Item</Text>
-
-        <Text style={styles.label}>Dish Name</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Enter dish name"
-          value={dishName}
-          onChangeText={setDishName}
+        <MenuItemForm
+          mode="edit"
+          dishName={dishName}
+          onDishNameChange={setDishName}
+          description={description}
+          onDescriptionChange={setDescription}
+          course={course}
+          onCourseChange={setCourse}
+          price={price}
+          onPriceChange={setPrice}
+          error={error}
+          imageUri={selectedImage}
+          onSelectImage={selectDishImage}
+          onRemoveImage={() => setSelectedImage(undefined)}
+          onSave={updateMenuItem}
+          onCancel={() => setScreen('details')}
+          onBack={showHome}
         />
-
-        <Text style={styles.label}>Description</Text>
-
-        <TextInput
-          style={[styles.input, styles.descriptionInput]}
-          placeholder="Enter dish description"
-          value={description}
-          onChangeText={setDescription}
-          multiline
-        />
-
-        <Text style={styles.label}>Course</Text>
-
-        <View style={styles.courseContainer}>
-          <TouchableOpacity
-            style={[
-              styles.courseButton,
-              course === 'Starter' && styles.selectedCourse,
-            ]}
-            onPress={() => setCourse('Starter')}>
-            <Text
-              style={[
-                styles.courseText,
-                course === 'Starter' && styles.selectedCourseText,
-              ]}>
-              Starter
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.courseButton,
-              course === 'Main Course' && styles.selectedCourse,
-            ]}
-            onPress={() => setCourse('Main Course')}>
-            <Text
-              style={[
-                styles.courseText,
-                course === 'Main Course' && styles.selectedCourseText,
-              ]}>
-              Main Course
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.courseButton,
-              course === 'Dessert' && styles.selectedCourse,
-            ]}
-            onPress={() => setCourse('Dessert')}>
-            <Text
-              style={[
-                styles.courseText,
-                course === 'Dessert' && styles.selectedCourseText,
-              ]}>
-              Dessert
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Price</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Enter price"
-          keyboardType="numeric"
-          value={price}
-          onChangeText={setPrice}
-        />
-
-        {error !== '' && (
-          <Text style={styles.errorText}>{error}</Text>
-        )}
-        {renderImagePicker()}
-  <AppButton
-  title="Update Menu Item"
-  onPress={updateMenuItem}
-/>
-
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => setScreen('details')}>
-          <Text style={styles.cancelText}>Cancel</Text>
-        </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={showHome}>
-            <Text style={styles.cancelText}>Back</Text>
-          </TouchableOpacity>
-        </ScrollView>
       )}
     </SafeAreaView>
   );
@@ -690,17 +432,6 @@ const styles = StyleSheet.create({
     padding: 24,
   },
 
-  imagePickerContainer: {
-    marginTop: 8,
-  },
-
-  dishImage: {
-    width: '100%',
-    height: 200,
-    marginTop: 10,
-    borderRadius: 8,
-  },
-
   title: {
     fontSize: 26,
     fontWeight: '700',
@@ -719,25 +450,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#666666',
     marginBottom: 20,
-  },
-
-  emptyCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 24,
-    borderRadius: 12,
-    marginBottom: 25,
-  },
-
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 8,
-  },
-
-  emptyText: {
-    fontSize: 15,
-    color: '#777777',
   },
 
   detailsCard: {
@@ -774,66 +486,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  label: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#333333',
-    marginBottom: 8,
-    marginTop: 14,
-  },
-
-  input: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DDDDDD',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-  },
-
-  descriptionInput: {
-    height: 90,
-    textAlignVertical: 'top',
-  },
-
-  courseContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
-  courseButtons: {
-    flexDirection: 'row',
-    flex: 1,
-    marginLeft: 12,
-  },
-
-  courseButton: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#DDDDDD',
-    borderRadius: 8,
-    paddingVertical: 12,
-    marginRight: 6,
-    alignItems: 'center',
-  },
-
-  selectedCourse: {
-    backgroundColor: '#2E7D32',
-    borderColor: '#2E7D32',
-  },
-
-  courseText: {
-    fontSize: 13,
-    color: '#333333',
-  },
-
-  selectedCourseText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-
   primaryButton: {
     backgroundColor: '#2E7D32',
     paddingVertical: 15,
@@ -847,70 +499,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-
-  cancelButton: {
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-
-  cancelText: {
-    color: '#333333',
-    fontSize: 15,
-    fontWeight: '500',
-  },
-
-  errorText: {
-    color: '#C62828',
-    fontSize: 14,
-    marginTop: 12,
-  },
- filterLabel: {
-  fontSize: 15,
-  fontWeight: '600',
-  color: '#333',
-  marginTop: 16,
-  marginBottom: 10,
-},
-
-filterContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 8,
-},
-
-filterButton: {
-  borderWidth: 1,
-  borderColor: '#CCCCCC',
-  borderRadius: 8,
-  paddingVertical: 10,
-  paddingHorizontal: 10,
-  backgroundColor: '#FFFFFF',
-  alignItems: 'center',
-  justifyContent: 'center',
-},
-
-selectedFilterButton: {
-  width: 78,
-  borderWidth: 1,
-  borderColor: '#2E7D32',
-  borderRadius: 8,
-  paddingVertical: 10,
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: '#E8F5E9',
-},
-
-filterText: {
-  color: '#555',
-  fontSize: 13,
-},
-
-selectedFilterText: {
-  color: '#2E7D32',
-  fontSize: 13,
-  fontWeight: '600',
-},
 
 clearButton: {
   borderWidth: 1,
